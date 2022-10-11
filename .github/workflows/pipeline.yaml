@@ -27,7 +27,11 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Docker Image Build
-        run: docker image build -t nexus-iq-server --build-arg APP_VERSION=$(jq -r .app_version app_properties.json)
+        run: |
+          docker image build \
+            -t nexus-iq-server \
+            --build-arg APP_VERSION=$(jq -r .app_version app_properties.json) \
+            build/
 
       # Runs a set of commands using the runners shell
       - name: Show list of Image
