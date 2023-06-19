@@ -27,9 +27,68 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Docker Image Build
-        run: docker image build -t nexus-iq-server --build-arg APP_VERSION=$(jq -r .app_version app_properties.json)
-
-      # Runs a set of commands using the runners shell
-      - name: Show list of Image
         run: |
-          docker image ls
+          docker image build \
+            -t nexus-iq-server \
+            --build-arg APP_VERSION=$(jq -r .version app_properties.json) \
+            build/
+
+      - name: Docker Login to Registry
+        run: echo $DOCKER_REGISTRY_PASSWORD | docker login --username $DOCKER_REGISTRY_USER --password-stdin 
+
+      - name: Docker Image push to Registry
+        run: docker image push nexus-iq-server
+
+      - name: Docker Logout Registry
+        run: docker logout
+
+      - name: Create Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: drop
+          path: deploy
+
+  deploy_non_prod:
+    runs_on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: drop
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Install Ansible
+      run: pip install ansible
+
+    - name: Deploy Ansible Playbook
+      run: |
+        cd deploy
+        ansible-playbook -i hosts -e deploy_environment=non_prod start.yaml
+
+  deploy_prod:
+    runs_on: ubuntu-latest
+    needs: build, deploy_non_prod
+    # add condition to run this stage only for "main" branch
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: drop
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Install Ansible
+      run: pip install ansible
+
+    - name: Deploy Ansible Playbook
+      run: |
+        cd deploy
+        ansible-playbook -i hosts -e deploy_environment=prod start.yaml
