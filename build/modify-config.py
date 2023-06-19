@@ -1,5 +1,4 @@
-import os
-import yaml 
+import os, yaml 
 
 CONFIG_FILE = os.environ['NEXUS_IQ_CONFIG_FILE']
 NEW_CONFIG_FILE = os.environ['NEXUS_IQ_NEW_CONFIG_FILE']
