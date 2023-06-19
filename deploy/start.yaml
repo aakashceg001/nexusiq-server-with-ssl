@@ -1,0 +1,5 @@
+- hosts: "{{ environment }}"
+  gather_facts: true
+  tasks:
+  - import_tasks: packages.yaml
+  - import_tasks: nexusiq.yaml

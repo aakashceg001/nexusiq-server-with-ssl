@@ -1,0 +1,70 @@
+--- 
+
+- name: Create nexusiq user
+  ansible.builtin.user:
+    name: nexusiq
+    shell: /bin/bash
+    groups: docker
+    append: yes
+
+- name: Copy SSL Certificates
+  copy:
+    src: keystore.p12
+    dest: /home/nexusiq/keystore.p12
+    owner: nexusiq
+    group: nexusiq
+    mode: 0400
+
+- name: Create Required Directories for Nexus IQ
+  file: 
+    path: "{{ item }}"
+    state: directory 
+    owner: nexusiq
+    group: nexusiq
+    mode: 0755
+  loop: 
+  - /opt/app/nexusiq/data
+  - /opt/app/nexusiq/log
+
+- name: Log in to docker registry
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
+
+- name: Create private Docker Network
+  community.docker.docker_network:
+    name: "nexusiq"
+
+- name: "Start NexusIQ Docker Container"
+  community.docker.docker_container:
+    name: nexusiq
+    image: "{{ nexusiq_docker_image }}"
+    state: started
+    restart: yes
+    restart_policy: "unless-stopped"
+    pull: true
+    env: 
+      BASE_URL: "{{ nexusiq_base_url }}"
+      DB_USER: "{{ nexusiq_db_user }}"
+      DB_PASS: "{{ nexusiq_db_password }}"
+      DB_HOST: "{{ nexusiq_db_host }}"
+      DB_NAME: "{{ nexusiq_db_name }}"
+      DB_PORT: "{{ nexusiq_db_port }}"
+      KEYSTORE_PATH: "/opt/keystore.p12"
+      KEYSTORE_PASSWORD: "abcxyz"
+      JAVA_OPTS: "-Xms{{ nexusiq_min_ram }} -Xmx{{ nexusiq_max_ram }} -XX:+UseG1GC"
+    networks: 
+      - name: "nexusiq"
+    ports: 
+      - "8443:8443"
+      - "8444:8444"
+    volumes:
+    - /home/nexusiq/keystore.p12:/opt/keystore.p12
+    - /opt/app/nexusiq/data:/sonatype-work
+    - /opt/app/nexusiq/log:/var/log/nexus-iq-server
+
+- name: "Log out docker registry"
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry }}"
+    state: absent

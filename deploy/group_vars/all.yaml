@@ -1,0 +1,12 @@
+# nexusiq.yaml
+docker_registry: "" 
+docker_registry_username: "" 
+docker_registry_password: ""
+
+ansible_user: ansible 
+ansible_user_password: "abcxyz"
+ansible_become: true
+ansible_become_method: sudo 
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+nexusiq_docker_image: 

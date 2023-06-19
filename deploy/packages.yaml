@@ -1,0 +1,45 @@
+---
+# Playbook to install packages
+
+- name: Installing Necessary Packages
+  yum:
+    name: yum-utils
+    state: present
+    update_cache: yes
+    
+- name: Install python3 
+  yum: 
+    name: python39
+    state: present
+
+- name: Install docker python sdk within user directory
+  pip:
+    name: docker
+    extra_args: --user
+
+- name: Add Docker Yum Repo
+  yum_repository:
+    name: docker-ce-stable
+    description: "Docker CE Stable"
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    enabled: true
+
+- name: Install Docker Package
+  yum:
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+    state: present
+    enablerepo: docker-ce-repo
+    update_cache: yes 
+
+- name: Start Docker Service
+  service: 
+    name: docker 
+    enabled: yes 
+    state: started

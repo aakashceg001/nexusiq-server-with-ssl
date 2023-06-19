@@ -1,0 +1,10 @@
+nexusiq_base_url: 'nexusiq.example.com'
+
+nexusiq_db_user: 'nexusiq'
+nexusiq_db_host: 'nexusiq_db' 
+nexusiq_db_password: 'xyz'
+nexusiq_db_port: '5432'
+nexusiq_db_name: 'nexusiq'
+
+nexusiq_min_ram: '8G'
+nexusiq_max_ram: '16G'

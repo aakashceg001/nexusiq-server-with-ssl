@@ -1,9 +1,6 @@
 import os
 import yaml 
 
-os.environ['NEXUS_IQ_CONFIG_FILE'] = 'build/nexusiq/config.yml'
-os.environ['NEXUS_IQ_NEW_CONFIG_FILE'] = 'config-new.yml'
-
 CONFIG_FILE = os.environ['NEXUS_IQ_CONFIG_FILE']
 NEW_CONFIG_FILE = os.environ['NEXUS_IQ_NEW_CONFIG_FILE']
 
@@ -26,7 +23,7 @@ config['server']['applicationConnectors'] = [
 config['server']['adminConnectors'] = [
     {
         "type": "https",
-        "port": "8471",
+        "port": "8444",
         "keyStorePath": r"${KEYSTORE_PATH}",
         "keyStorePassword": r"${KEYSTORE_PASSWORD}"
     }
