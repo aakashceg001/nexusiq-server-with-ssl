@@ -22,6 +22,9 @@ In the deploy phase,
 - Ansible scripts are used to configure the VM to install required packages like Docker.
 - Deploy the new custom Image generated in the build phase as a Docker container. 
 
+> [!NOTE]
+> Two ports are exposed in Docker container. One is for the application (8443) & another is for system admin (8444).  
+
 # Upgrade
 - To upgrade nexusiq application, just change the iq version in the `app_properties.json` file.
 
